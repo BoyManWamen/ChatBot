@@ -15,4 +15,4 @@ Bot's prefix is +
 
 Support Server: https://discord.gg/DRghdsN2Bu
 
-Discord Bot Invite Link: https://discord.com/api/oauth2/authorize?client_id=791829989750210570&permissions=8&scope=bot
+Discord Bot Invite Link: https://discord.com/api/oauth2/authorize?client_id=791829989750210570&permissions=117760&scope=bot
