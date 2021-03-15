@@ -143,7 +143,7 @@ async def on_ready():
 
 @client.command()
 async def commands(ctx):
-    embed=discord.Embed(title="Manual",description=f"\nCommands:\n\n+translate | example: (+translate English-Spanish hello)\n\n+image | example: (+image Meme or +image 3 Meme)\n\n+search | example: (+search Meme or +search 3 Meme)\n\n+youtube | example: (+youtube Music or +youtube 3 Music)\n\nPinging the bot will make it respond using a neural network database. | example: (<@!791829989750210570> hey)\n\nBot's prefix is +\n\nSupport Server: https://discord.gg/DRghdsN2Bu\n\nDiscord Bot Invite Link: https://discord.com/api/oauth2/authorize?client_id=791829989750210570&permissions=8&scope=bot",type="rich",colour=0xFF0000)
+    embed=discord.Embed(title="Manual",description=f"\nCommands:\n\n+translate | example: (+translate English-Spanish hello)\n\n+image | example: (+image Meme or +image 3 Meme)\n\n+search | example: (+search Meme or +search 3 Meme)\n\n+youtube | example: (+youtube Music or +youtube 3 Music)\n\nPinging the bot will make it respond using a neural network database. | example: (<@!791829989750210570> hey)\n\nBot's prefix is +\n\nSupport Server: https://discord.gg/DRghdsN2Bu\n\nDiscord Bot Invite Link: https://discord.com/api/oauth2/authorize?client_id=791829989750210570&permissions=117760&scope=bot",type="rich",colour=0xFF0000)
     await ctx.send(embed=embed)
 
 @client.command()
