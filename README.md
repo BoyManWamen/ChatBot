@@ -13,6 +13,6 @@ Pinging the bot will make it respond using a neural network database. | example:
 
 Bot's prefix is +
 
-Support Server: https://discord.gg/6Fu2399thq
+Support Server: https://discord.gg/DRghdsN2Bu
 
 Discord Bot Invite Link: https://discord.com/api/oauth2/authorize?client_id=791829989750210570&permissions=8&scope=bot
