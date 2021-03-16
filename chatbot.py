@@ -1,6 +1,7 @@
 import discord, re, os
 from discord.ext import commands
 from googlesearch import search
+global search
 from googletrans import Translator
 from chatterbot import ChatBot
 from chatterbot.trainers import ChatterBotCorpusTrainer
@@ -13,7 +14,7 @@ class AppURLopener(urllib.request.FancyURLopener):
 
 opener = AppURLopener()
 chatbot = ChatBot('Rob Obvious')
-trainer = ChatterBotCorpusTrainer(chatbot)
+trainer = ChatterBotCorpusTrainer(chatbot.storage)
 trainer.train("chatterbot.corpus.english")
 client = commands.Bot(command_prefix='+')
 translator = Translator()
@@ -150,10 +151,10 @@ async def commands(ctx):
 
 @client.command()
 async def search(ctx, count, *, args=None):
+    from googlesearch import search
     try:
         count=int(count)
         if count <= 3:
-            from googlesearch import search
             for url in search(fr'{args}', stop=count):
                 try:
                     soup = BeautifulSoup(opener.open(url),"html.parser")
@@ -173,7 +174,6 @@ async def search(ctx, count, *, args=None):
             await ctx.send("You can't have more than three searches per command.")
     except:
         if args != None:
-            from googlesearch import search
             for url in search(fr"{count} {args}", stop=1):
                 try:
                     soup = BeautifulSoup(opener.open(url),"html.parser")
@@ -190,7 +190,6 @@ async def search(ctx, count, *, args=None):
                     search = Search(name=title,description=f"Google Search\nLink: {url}")
                     await ctx.send(embed=search.embed)
         else:
-            from googlesearch import search
             for url in search(fr"{count}", stop=1):
                 try:
                     soup = BeautifulSoup(opener.open(url),"html.parser")
@@ -209,12 +208,12 @@ async def search(ctx, count, *, args=None):
 
 @client.command()
 async def image(ctx, count, *, args=None):
+    from googlesearch import search
     try:
         try:
             count=int(count)
             if count <= 3:
-                from googlesearch import search
-                for url in search(fr'{args} https://www.google.com/imghp?hl=EN', stop=count):
+                for url in search(fr'https://www.google.com/search?hl=EN&tbm=isch&source=hp&biw=1920&bih=969&ei=idhQYPaiDoOksAX54rmIDg&q={(args.lower).replace(" ","+")}&oq={(args.lower).replace(" ","+")}', stop=count):
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
                     image = Image(name=title,description=f"Image\nLink: {url}",image=url)
@@ -223,15 +222,13 @@ async def image(ctx, count, *, args=None):
                 await ctx.send("You can't have more than three searches per command.")
         except:
             if args != None:
-                from googlesearch import search
-                for url in search(fr"{count} {args} https://www.google.com/imghp?hl=EN", stop=1):
+                for url in search(fr'https://www.google.com/search?hl=EN&tbm=isch&source=hp&biw=1920&bih=969&ei=idhQYPaiDoOksAX54rmIDg&q={(count+"+"+args.lower).replace(" ","+")}&oq={(count+"+"+args.lower).replace(" ","+")}', stop=1):
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
                     image = Image(name=title,description=f"Image\nLink: {url}",image=url)
                     await ctx.send(embed=image.embed)
             else:
-                from googlesearch import search
-                for url in search(fr"{count} https://www.google.com/imghp?hl=EN", stop=1):
+                for url in search(fr'https://www.google.com/search?hl=EN&tbm=isch&source=hp&biw=1920&bih=969&ei=idhQYPaiDoOksAX54rmIDg&q={(count+"+"+args.lower).replace(" ","+")}&oq={(count+"+"+args.lower).replace(" ","+")}', stop=1):
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
                     image = Image(name=title,description=f"Image\nLink: {url}",image=url)
@@ -241,11 +238,11 @@ async def image(ctx, count, *, args=None):
 
 @client.command()
 async def youtube(ctx, count, *, args=None):
+    from googlesearch import search
     try:
         try:
             count=int(count)
             if count <= 3:
-                from googlesearch import search
                 for url in search(fr'youtube {args}', stop=count):
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
@@ -254,13 +251,11 @@ async def youtube(ctx, count, *, args=None):
                 await ctx.send("You can't have more than three searches per command.")
         except:
             if args != None:
-                from googlesearch import search
                 for url in search(fr"youtube {count} {args}", stop=1):
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
                     await ctx.send(f"{title} - {url}")
             else:
-                from googlesearch import search
                 for url in search(fr"youtube {count}", stop=1):
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
