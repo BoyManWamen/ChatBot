@@ -212,7 +212,7 @@ async def image(ctx, count, *, args=None):
         try:
             count=int(count)
             if count <= 3:
-                for url in search(fr'https://www.google.com/search?hl=EN&tbm=isch&source=hp&biw=1920&bih=969&ei=idhQYPaiDoOksAX54rmIDg&q={(args.lower).replace(" ","+")}&oq={(args.lower).replace(" ","+")}', stop=count):
+                for url in search(fr'PNG {args}', stop=count):
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
                     image = Image(name=title,description=f"Image\nLink: {url}",image=url)
@@ -221,13 +221,13 @@ async def image(ctx, count, *, args=None):
                 await ctx.send("You can't have more than three searches per command.")
         except:
             if args != None:
-                for url in search(fr'https://www.google.com/search?hl=EN&tbm=isch&source=hp&biw=1920&bih=969&ei=idhQYPaiDoOksAX54rmIDg&q={(count+"+"+args.lower).replace(" ","+")}&oq={(count+"+"+args.lower).replace(" ","+")}', stop=1):
+                for url in search(fr'PNG {count} {args}', stop=1):
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
                     image = Image(name=title,description=f"Image\nLink: {url}",image=url)
                     await ctx.send(embed=image.embed)
             else:
-                for url in search(fr'https://www.google.com/search?hl=EN&tbm=isch&source=hp&biw=1920&bih=969&ei=idhQYPaiDoOksAX54rmIDg&q={(count+"+"+args.lower).replace(" ","+")}&oq={(count+"+"+args.lower).replace(" ","+")}', stop=1):
+                for url in search(fr'PNG {count} {args}', stop=1):
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
                     image = Image(name=title,description=f"Image\nLink: {url}",image=url)
