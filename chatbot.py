@@ -1,18 +1,21 @@
 import discord, re, os
 from discord.ext import commands
-from googleapiclient.discovery import build
+from googlesearch import search
 from googletrans import Translator
 from chatterbot import ChatBot
 from chatterbot.trainers import ChatterBotCorpusTrainer
+import urllib.request
+from bs4 import BeautifulSoup
 from keepalive import keepalive
 
+class AppURLopener(urllib.request.FancyURLopener):
+    version = "Mozilla/5.0"
+
+opener = AppURLopener()
 chatbot = ChatBot('Rob Obvious')
-trainer = ChatterBotCorpusTrainer(chatbot.storage)
+trainer = ChatterBotCorpusTrainer(chatbot)
 trainer.train("chatterbot.corpus.english")
-googleapi = os.getenv('GOOGLEAPI')
-googleenginetoken = os.getenv('ENGINETOKEN')
 client = commands.Bot(command_prefix='+')
-resource = build("customsearch", "v1", developerKey=googleapi).cse()
 translator = Translator()
 
 class Image():
@@ -142,157 +145,128 @@ async def on_ready():
 
 @client.command()
 async def commands(ctx):
-    embed=discord.Embed(title="Manual",description="\nCommands:\n\n+translate | example: (+translate English-Spanish hello)\n\n+image | example: (+image Meme or +image 3 Meme)\n\n+search | example: (+search Meme or +search 3 Meme)\n\n+youtube | example: (+youtube Music or +youtube 3 Music)\n\nPinging the bot will make it respond using a neural network database. | example: (<@!791829989750210570> hey)\n\nBot's prefix is +\n\nAmount of searches that can be sent per command are capped at 9\n\nSupport Server: https://discord.gg/DRghdsN2Bu\n\nDiscord Bot Invite Link: https://discord.com/api/oauth2/authorize?client_id=791829989750210570&permissions=117760&scope=bot",type="rich",colour=0xFF0000)
+    embed=discord.Embed(title="Manual",description="\nCommands:\n\n+translate | example: (+translate English-Spanish hello)\n\n+image | example: (+image Meme or +image 3 Meme)\n\n+search | example: (+search Meme or +search 3 Meme)\n\n+youtube | example: (+youtube Music or +youtube 3 Music)\n\nPinging the bot will make it respond using a neural network database. | example: (<@!791829989750210570> hey)\n\nBot's prefix is +\n\nSupport Server: https://discord.gg/6Fu2399thq\n\nDiscord Bot Invite Link: https://discord.com/api/oauth2/authorize?client_id=791829989750210570&permissions=8&scope=bot",type="rich",colour=0xFF0000)
     await ctx.send(embed=embed)
 
 @client.command()
 async def search(ctx, count, *, args=None):
     try:
-        try:
-            int(count)
-            args = fr'{args}'
-            result = resource.list(q=fr'{args}', cx=googleenginetoken, start=1).execute()
-            try:
-                for item in result['items']:
-                    if item == result['items'][int(count)]:
-                        break
-                    search = Search(name=item['title'],description=f"Google Search\nLink: {item['link']}\n{item['snippet']}")
-                    await ctx.send(embed=search.embed)
-            except:
-                for item in result['items']:
-                    if item == result['items'][int(count)]:
-                        break
-                    search = Search(name=item['title'],description=f"Google Search\nLink: {item['link']}")
-                    await ctx.send(embed=search.embed)
-        except:
-            if args != None:
-                count = fr'{count}'
-                args = fr'{args}'
-                result = resource.list(q=fr"{count} {args}", cx=googleenginetoken, start=1).execute()
+        count=int(count)
+        if count <= 3:
+            from googlesearch import search
+            for url in search(fr'{args}', stop=count):
                 try:
-                    for item in result['items']:
-                        if item == result['items'][1]:
-                            break
-                        search = Search(name=item['title'],description=f"Google Search\nLink: {item['link']}\n{item['snippet']}")
-                        await ctx.send(embed=search.embed)
+                    soup = BeautifulSoup(opener.open(url),"html.parser")
+                    title=soup.title.string
+                    metas=soup.find_all('meta')
+                    meta=[ meta.attrs['content'] for meta in metas if 'name' in meta.attrs and meta.attrs['name'] == 'description' ]
+                    search = Search(name=title,description=f"Google Search\nLink: {url}\n{meta[len(meta)-1]}")
+                    await ctx.send(embed=search.embed)
                 except:
-                    for item in result['items']:
-                        search = Search(name=item['title'],description=f"Google Search\nLink: {item['link']}")
-                        await ctx.send(embed=search.embed)
-                        if item == result['items'][1]:
-                            break
-            else:
-                count = fr'{count}'
-                result = resource.list(q=fr"{count}", cx=googleenginetoken, start=1).execute()
-                try:
-                    for item in result['items']:
-                        if item == result['items'][1]:
-                            break                    
-                        search = Search(name=item['title'],description=f"Google Search\nLink: {item['link']}\n{item['snippet']}")
-                        await ctx.send(embed=search.embed)
-                except:
-                    for item in result['items']:
-                        if item == result['items'][1]:
-                            break                    
-                        search = Search(name=item['title'],description=f"Google Search\nLink: {item['link']}")
-                        await ctx.send(embed=search.embed)
+                    soup = BeautifulSoup(opener.open(url),"html.parser")
+                    title=soup.title.string
+                    metas=soup.find_all('meta')
+                    meta=[ meta.attrs['content'] for meta in metas if 'name' in meta.attrs and meta.attrs['name'] == 'description' ]
+                    search = Search(name=title,description=f"Google Search\nLink: {url}")
+                    await ctx.send(embed=search.embed)
+        elif count > 3:
+            await ctx.send("You can't have more than three searches per command.")
     except:
-        await ctx.send("There were no results.")
+        if args != None:
+            from googlesearch import search
+            for url in search(fr"{count} {args}", stop=1):
+                try:
+                    soup = BeautifulSoup(opener.open(url),"html.parser")
+                    title=soup.title.string
+                    metas=soup.find_all('meta')
+                    meta=[ meta.attrs['content'] for meta in metas if 'name' in meta.attrs and meta.attrs['name'] == 'description' ]
+                    search = Search(name=title,description=f"Google Search\nLink: {url}\n{meta[len(meta)-1]}")
+                    await ctx.send(embed=search.embed)
+                except:
+                    soup = BeautifulSoup(opener.open(url),"html.parser")
+                    title=soup.title.string
+                    metas=soup.find_all('meta')
+                    meta=[ meta.attrs['content'] for meta in metas if 'name' in meta.attrs and meta.attrs['name'] == 'description' ]
+                    search = Search(name=title,description=f"Google Search\nLink: {url}")
+                    await ctx.send(embed=search.embed)
+        else:
+            from googlesearch import search
+            for url in search(fr"{count}", stop=1):
+                try:
+                    soup = BeautifulSoup(opener.open(url),"html.parser")
+                    title=soup.title.string
+                    metas=soup.find_all('meta')
+                    meta=[ meta.attrs['content'] for meta in metas if 'name' in meta.attrs and meta.attrs['name'] == 'description' ]
+                    search = Search(name=title,description=f"Google Search\nLink: {url}\n{meta[len(meta)-1]}")
+                    await ctx.send(embed=search.embed)
+                except:
+                    soup = BeautifulSoup(opener.open(url),"html.parser")
+                    title=soup.title.string
+                    metas=soup.find_all('meta')
+                    meta=[ meta.attrs['content'] for meta in metas if 'name' in meta.attrs and meta.attrs['name'] == 'description' ]
+                    search = Search(name=title,description=f"Google Search\nLink: {url}")
+                    await ctx.send(embed=search.embed)
 
 @client.command()
 async def image(ctx, count, *, args=None):
     try:
         try:
-            int(count)
-            args = fr'{args}'
-            result = resource.list(q=fr"{args}", cx=googleenginetoken, start=1, searchType='image').execute()
-            for item in result['items']:
-                if item == result['items'][int(count)]:
-                    break            
-                image = Image(name=item['title'],image=item['link'],description="Image")
-                await ctx.send(embed=image.embed)
+            count=int(count)
+            if count <= 3:
+                from googlesearch import search
+                for url in search(fr'{args} https://www.google.com/imghp?hl=EN', stop=count):
+                    soup = BeautifulSoup(opener.open(url),"html.parser")
+                    title=soup.title.string
+                    image = Image(name=title,description=f"Image\nLink: {url}",image=url)
+                    await ctx.send(embed=image.embed)
+            elif count > 3:
+                await ctx.send("You can't have more than three searches per command.")
         except:
             if args != None:
-                count = fr'{count}'
-                args = fr'{args}'
-                result = resource.list(q=fr"{str(count)} {args}", cx=googleenginetoken, start=1, searchType='image').execute()
-                for item in result['items']:
-                    if item == result['items'][1]:
-                        break
-                    image = Image(name=item['title'],image=item['link'],description="Image")
+                from googlesearch import search
+                for url in search(fr"{count} {args} https://www.google.com/imghp?hl=EN", stop=1):
+                    soup = BeautifulSoup(opener.open(url),"html.parser")
+                    title=soup.title.string
+                    image = Image(name=title,description=f"Image\nLink: {url}",image=url)
                     await ctx.send(embed=image.embed)
             else:
-                count = fr'{count}'
-                result = resource.list(q=fr"{str(count)}", cx=googleenginetoken, start=1, searchType='image').execute()
-                for item in result['items']:
-                    if item == result['items'][1]:
-                        break
-                    image = Image(name=item['title'],image=item['link'],description="Image")
+                from googlesearch import search
+                for url in search(fr"{count} https://www.google.com/imghp?hl=EN", stop=1):
+                    soup = BeautifulSoup(opener.open(url),"html.parser")
+                    title=soup.title.string
+                    image = Image(name=title,description=f"Image\nLink: {url}",image=url)
                     await ctx.send(embed=image.embed)
     except:
         await ctx.send("There were no results.")
 
 @client.command()
-async def youtube(ctx, count, *, args=None, starting=None):
-    if starting == None:
+async def youtube(ctx, count, *, args=None):
+    try:
         try:
-            try:
-                int(count)
-                args = fr'{args}'
-                starting = fr'{starting}'
-                result = resource.list(q=fr"www.youtube.com {args}", cx=googleenginetoken, start=1).execute()
-                for item in result['items']:
-                    if item == result['items'][int(count)]:
-                        break                
-                    await ctx.send(f"{item['title']} - {item['link']}")
-            except:
-                if args != None:
-                    count = fr'{count}'
-                    args = fr'{args}'
-                    starting = fr'{starting}'
-                    result = resource.list(q=fr"www.youtube.com {str(count)} {args}", cx=googleenginetoken, start=1).execute()
-                    for item in result['items']:
-                        if item == result['items'][1]:
-                            break
-                        await ctx.send(f"{item['title']} - {item['link']}")
-                else:
-                    count = fr'{count}'
-                    result = resource.list(q=fr"www.youtube.com {str(count)}", cx=googleenginetoken, start=1).execute()
-                    for item in result['items']:
-                        if item == result['items'][1]:
-                            break
-                        await ctx.send(f"{item['title']} - {item['link']}")
+            count=int(count)
+            if count <= 3:
+                from googlesearch import search
+                for url in search(fr'youtube {args}', stop=count):
+                    soup = BeautifulSoup(opener.open(url),"html.parser")
+                    title=soup.title.string
+                    await ctx.send(f"{title} - {url}")
+            elif count > 3:
+                await ctx.send("You can't have more than three searches per command.")
         except:
-            await ctx.send("There were no results")
-    else:
-        try:
-            try:
-                int(starting)
-                int(count)
-                args = fr'{args}'
-                result = resource.list(q=fr"www.youtube.com {args}", cx=googleenginetoken, start=starting).execute()
-                for item in result['items']:
-                    if item == result['items'][int(count)]:
-                        break                
-                    await ctx.send(f"{item['title']} - {item['link']}")
-            except:
-                if args != None and starting != None:
-                    count = fr'{count}'
-                    args = fr'{args}'
-                    result = resource.list(q=fr"www.youtube.com {str(count)} {args}", cx=googleenginetoken, start=starting).execute()
-                    for item in result['items']:
-                        if item == result['items'][1]:
-                            break
-                        await ctx.send(f"{item['title']} - {item['link']}")
-                else:
-                    count = fr'{count}'
-                    result = resource.list(q=fr"www.youtube.com {str(count)}", cx=googleenginetoken, start=1).execute()
-                    for item in result['items']:
-                        if item == result['items'][1]:
-                            break
-                        await ctx.send(f"{item['title']} - {item['link']}")
-        except:
-            await ctx.send("There were no results.")
+            if args != None:
+                from googlesearch import search
+                for url in search(fr"youtube {count} {args}", stop=1):
+                    soup = BeautifulSoup(opener.open(url),"html.parser")
+                    title=soup.title.string
+                    await ctx.send(f"{title} - {url}")
+            else:
+                from googlesearch import search
+                for url in search(fr"youtube {count}", stop=1):
+                    soup = BeautifulSoup(opener.open(url),"html.parser")
+                    title=soup.title.string
+                    await ctx.send(f"{title} - {url}")
+    except:
+        await ctx.send("There were no results.")
 
 @client.command()
 async def translate(ctx, language, *, args=None):
