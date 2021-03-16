@@ -1,7 +1,6 @@
 import discord, re, os
 from discord.ext import commands
 from googlesearch import search
-global search
 from googletrans import Translator
 from chatterbot import ChatBot
 from chatterbot.trainers import ChatterBotCorpusTrainer
