@@ -145,7 +145,7 @@ async def on_ready():
 
 @client.command()
 async def commands(ctx):
-    embed=discord.Embed(title="Manual",description="\nCommands:\n\n+translate | example: (+translate English-Spanish hello)\n\n+image | example: (+image Meme or +image 3 Meme)\n\n+search | example: (+search Meme or +search 3 Meme)\n\n+youtube | example: (+youtube Music or +youtube 3 Music)\n\nPinging the bot will make it respond using a neural network database. | example: (<@!791829989750210570> hey)\n\nBot's prefix is +\n\nSupport Server: https://discord.gg/6Fu2399thq\n\nDiscord Bot Invite Link: https://discord.com/api/oauth2/authorize?client_id=791829989750210570&permissions=8&scope=bot",type="rich",colour=0xFF0000)
+    embed=discord.Embed(title="Manual",description="\nCommands:\n\n+translate | example: (+translate English-Spanish hello)\n\n+image | example: (+image Meme or +image 3 Meme)\n\n+search | example: (+search Meme or +search 3 Meme)\n\n+youtube | example: (+youtube Music or +youtube 3 Music)\n\n+chat | example: (+chat hey)\n\nBot's prefix is +\n\nSupport Server: https://discord.gg/6Fu2399thq\n\nDiscord Bot Invite Link: https://discord.com/api/oauth2/authorize?client_id=791829989750210570&permissions=8&scope=bot",type="rich",colour=0xFF0000)
     await ctx.send(embed=embed)
 
 @client.command()
@@ -212,7 +212,7 @@ async def image(ctx, count, *, args=None):
         try:
             count=int(count)
             if count <= 3:
-                for url in search(fr'PNG {args}', stop=count):
+                for url in search(fr'PNG Image File {args}', stop=count):
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
                     image = Image(name=title,description=f"Image\nLink: {url}",image=url)
@@ -221,13 +221,13 @@ async def image(ctx, count, *, args=None):
                 await ctx.send("You can't have more than three searches per command.")
         except:
             if args != None:
-                for url in search(fr'PNG {count} {args}', stop=1):
+                for url in search(fr'PNG Image File {count} {args}', stop=1):
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
                     image = Image(name=title,description=f"Image\nLink: {url}",image=url)
                     await ctx.send(embed=image.embed)
             else:
-                for url in search(fr'PNG {count} {args}', stop=1):
+                for url in search(fr'PNG Image File {count} {args}', stop=1):
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
                     image = Image(name=title,description=f"Image\nLink: {url}",image=url)
@@ -283,18 +283,12 @@ async def translate(ctx, language, *, args=None):
     except:
         await ctx.send("There was an error in processing your request.")
 
-@client.event
-async def on_message(message):
-    mention = fr'<@!{client.user.id}>'
-    try:
-        if message.author != client.user and message.content.startswith("+") == False and mention in message.content:
-            message.content = fr'{message.content}'
-            request = re.sub(mention,'',message.content)
-            response = chatbot.get_response(request)
-            await message.channel.send(fr"{response}")
-        await client.process_commands(message)
-    except:
-        await message.channel.send("There was an error in processing your request.")
+@client.command()
+async def chat(ctx, *, args):
+    args = fr'{args}'
+    request = args
+    response = chatbot.get_response(request)
+    await ctx.send(fr"{response}")
 
 keepalive()
 client.run(os.getenv('DISCORDTOKEN'))
