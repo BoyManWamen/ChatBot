@@ -9,7 +9,7 @@ Commands:
 
 +youtube | example: (+youtube Music or +youtube 3 Music)
 
-Pinging the bot will make it respond using a neural network database. | example: (@Chat Bot hey)
++chat | example: (+chat hey)
 
 Bot's prefix is +
 
