@@ -139,6 +139,8 @@ languages = {
 'Zulu':'zu'
 }
 
+google = search
+
 @client.event
 async def on_ready():
     await client.change_presence(activity=discord.Game(name="+commands for help"))
@@ -150,11 +152,11 @@ async def commands(ctx):
 
 @client.command()
 async def search(ctx, count, *, args=None):
-    from googlesearch import search
+    global google
     try:
         count=int(count)
         if count <= 3:
-            for url in search(fr'{args}', stop=count):
+            for url in google(fr'{args}', stop=count):
                 try:
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
@@ -173,7 +175,7 @@ async def search(ctx, count, *, args=None):
             await ctx.send("You can't have more than three searches per command.")
     except:
         if args != None:
-            for url in search(fr"{count} {args}", stop=1):
+            for url in google(fr"{count} {args}", stop=1):
                 try:
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
@@ -189,7 +191,7 @@ async def search(ctx, count, *, args=None):
                     search = Search(name=title,description=f"Google Search\nLink: {url}")
                     await ctx.send(embed=search.embed)
         else:
-            for url in search(fr"{count}", stop=1):
+            for url in google(fr"{count}", stop=1):
                 try:
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
@@ -207,12 +209,12 @@ async def search(ctx, count, *, args=None):
 
 @client.command()
 async def image(ctx, count, *, args=None):
-    from googlesearch import search
+    global google
     try:
         try:
             count=int(count)
             if count <= 3:
-                for url in search(fr'PNG Image File {args}', stop=count):
+                for url in google(fr'PNG Image File {args}', stop=count):
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
                     image = Image(name=title,description=f"Image\nLink: {url}",image=url)
@@ -221,13 +223,13 @@ async def image(ctx, count, *, args=None):
                 await ctx.send("You can't have more than three searches per command.")
         except:
             if args != None:
-                for url in search(fr'PNG Image File {count} {args}', stop=1):
+                for url in google(fr'PNG Image File {count} {args}', stop=1):
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
                     image = Image(name=title,description=f"Image\nLink: {url}",image=url)
                     await ctx.send(embed=image.embed)
             else:
-                for url in search(fr'PNG Image File {count} {args}', stop=1):
+                for url in google(fr'PNG Image File {count} {args}', stop=1):
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
                     image = Image(name=title,description=f"Image\nLink: {url}",image=url)
@@ -237,12 +239,12 @@ async def image(ctx, count, *, args=None):
 
 @client.command()
 async def youtube(ctx, count, *, args=None):
-    from googlesearch import search
+    global google
     try:
         try:
             count=int(count)
             if count <= 3:
-                for url in search(fr'youtube {args}', stop=count):
+                for url in google(fr'youtube {args}', stop=count):
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
                     await ctx.send(f"{title} - {url}")
@@ -250,12 +252,12 @@ async def youtube(ctx, count, *, args=None):
                 await ctx.send("You can't have more than three searches per command.")
         except:
             if args != None:
-                for url in search(fr"youtube {count} {args}", stop=1):
+                for url in google(fr"youtube {count} {args}", stop=1):
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
                     await ctx.send(f"{title} - {url}")
             else:
-                for url in search(fr"youtube {count}", stop=1):
+                for url in google(fr"youtube {count}", stop=1):
                     soup = BeautifulSoup(opener.open(url),"html.parser")
                     title=soup.title.string
                     await ctx.send(f"{title} - {url}")
