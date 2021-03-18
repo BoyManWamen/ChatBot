@@ -60,7 +60,7 @@ google-auth==1.27.0
 google-auth-oauthlib==0.4.2
 google-pasta==0.2.0
 googlesearch-python-extended==2020.1.0
-googletrans==3.0.0
+googletrans==3.1.0a0
 greenlet==1.0.0
 grpcio==1.35.0
 h11==0.9.0
